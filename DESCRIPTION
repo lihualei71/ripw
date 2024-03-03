@@ -1,0 +1,25 @@
+Package: ripw
+Type: Package
+Title: Reshaped Inverse Propensity Weighted (RIPW) Two-Way-Fixed-Effects (TWFE) Estimators for Panel Data Analysis
+Version: 1.0.0
+Authors@R: 
+  c(person("Lihua", "Lei", email = "lihualei@stanford.edu", role = c("aut", "cre")),
+    person("Xiaoman", "Luo", email = "luoxiaomannju@gmail.com", role = c("aut")))
+Description: Implementation of RIPW-TWFE estimators with derandomized cross-fitting.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+URL: https://arxiv.org/abs/2107.13737, https://github.com/lihualei71/ripw
+BugReports: https://github.com/lihualei71/ripw/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
+Imports: 
+    stats,
+    utils,
+    Matrix
+Suggests: 
+    survival,
+    lfe,
+    tidyverse
+Depends: 
+    R (>= 2.10)

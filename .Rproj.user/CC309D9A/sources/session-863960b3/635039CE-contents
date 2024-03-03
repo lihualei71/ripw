@@ -1,0 +1,39 @@
+# Class 13 -- Movies
+Movies = read.csv("Movies.csv")
+
+# Data summary
+summary(Movies)
+
+ind=sample(nrow(Movies),0.9*nrow(Movies))
+Movies=Movies[ind,]
+
+# Initial linear regression model:
+Movies1 = lm(IMDbScore ~ Budget + DirectorFacebookLikes + CastTotalFacebookLikes +
+                AvgDirectorScore + AvgActorScore + Duration + Drama + Comedy + Romance +
+                Action + Adventure + Mystery + Fantasy + Crime + SciFi + Thriller +
+                Family, data = Movies)
+summary(Movies1)
+plot(Movies1,1,pch=16,lwd=2)
+
+# Add content rating
+Movies2 = lm(IMDbScore ~ Budget + DirectorFacebookLikes + CastTotalFacebookLikes +
+               AvgDirectorScore + AvgActorScore + Duration + Drama + Comedy + Romance +
+               Action + Adventure + Mystery + Fantasy + Crime + SciFi + Thriller +
+               Family + factor(Rating), data = Movies)
+summary(Movies2)
+plot(Movies2,1,pch=16,lwd=2)
+
+# Drop duration and all dummies to see what happens
+Movies$Budget=Movies$Budget/1000000
+Movies$DirectorFacebookLikes = Movies$DirectorFacebookLikes/10000
+Movies$CastTotalFacebookLikes = Movies$CastTotalFacebookLikes/10000
+Movies3 = lm(IMDbScore ~ Budget + DirectorFacebookLikes + CastTotalFacebookLikes +
+               AvgDirectorScore + AvgActorScore, data = Movies)
+summary(Movies3)
+plot(Movies3,1,pch=16,lwd=2)
+
+# Correlation matrix
+library(corrplot)
+M=cor(Movies[sapply(Movies,is.numeric)],use="complete.obs")
+corrplot(M,method="pie",type="lower")
+

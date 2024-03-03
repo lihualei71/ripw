@@ -1,0 +1,268 @@
+---
+title: "Solutions to Midterm 2024"
+output: word_document
+date: "2024-02-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Question 1
+
+## 1(a)
+
+```{r}
+rm(list=ls())
+Stock = read.csv("dailystock.csv")
+
+#(a)
+mean(Stock$GSPC)
+mean(Stock$QQQ)
+mean(Stock$DJIA)
+
+# Alternative method to do all three at once with nicer output
+apply(Stock[,2:4],2,mean)
+```
+## 1(b)
+```{r}
+sd(Stock$GSPC)
+sd(Stock$QQQ)
+sd(Stock$DJIA)
+
+# Alternative method to do all three at once with nicer output
+apply(Stock[,2:4],2,sd)
+```
+The riskiest index is QQQ because it has the highest SD of 1.35%.  The safest is DJIA with an SD of 1.10%.
+
+## 1(c)
+```{r}
+cor(Stock[,2:4])
+```
+QQQ and DJIA have a correlation of 0.82, which is the lowest of the three pairs.
+
+## 1(d)
+```{r}
+m=mean(Stock$QQQ)
+s=sd(Stock$QQQ)
+n=nrow(Stock)
+
+# Approx 95% CI using multiplier=2
+m-2*s/sqrt(n) 
+m+2*s/sqrt(n)
+
+# Exact 95% CI
+mult = qnorm(0.975,0,1)
+m-mult*s/sqrt(n) 
+m+mult*s/sqrt(n)
+
+```
+The approx 95% CI (multiplier=2) is [0.022%,0.130%].
+The exact 95% CI is [0.023%,0.129%]
+
+## 1(e)
+```{r}
+teststat = (m-0.0005)/(s/sqrt(n))
+teststat
+pvalue = 1- pnorm(teststat,0,1)
+pvalue
+
+# T-test
+pvalue = 1-pt(teststat, n-1)
+```
+H0: mu<=0.05%, H1: mu>0.05%.  The (one-sided) p-value of 0.00257 is less than 0.05 so we can reject that the true mean daily return on the Nasdaq 100 is less than 0.05%.  
+
+The p-value says that: if the true mean return on the Nasdaq 100 were less than 0.05% then the chance of obtaining a mean return of at least 0.076% in a sample of this size is no more than 0.00257 (0.257%).
+
+
+## 1(f)
+```{r}
+hist(Stock$GSPC, breaks=100)
+
+mean(Stock$GSPC)
+sd(Stock$GSPC)
+#quantiles from the data
+quantile(Stock$GSPC,probs=c(0.01,0.05,0.25,0.5,0.75,0.95,0.99))
+#quantiles from the normal
+qnorm(c(0.01,0.05,0.25,0.5,0.75,0.95,0.99),mean(Stock$GSPC),sd(Stock$GSPC))
+
+```
+The histogram looks pretty close to a normal distribution with one exception: it has some very extreme outcomes of +/- 10% that are not really possible (such low probability that they should never occur) from a normal  distribution with an SD of 1.12%.  When we compare the quantiles from the data versus a normal distribution we also see many small deviations.  In particular, the mean and median are not exactly the same. Many of the quantiles are also a bit different -- really every quantile except the 99th percentile is a bit different.  So bottom line, it is close to normal in many ways, but also has some differences.
+
+
+## 1(g)
+```{r}
+qnorm(0.01,mean(Stock$QQQ),sd(Stock$QQQ))
+qnorm(0.01,mean(Stock$DJIA),sd(Stock$DJIA))
+
+```
+The daily Value-at-Risk for the Nasdaq 100 is -3.07%.
+The daily Value-at-Risk for the Dow Jones is -2.52%.
+
+## 1(h)
+```{r}
+mean(0.25*Stock$QQQ + 0.75*Stock$DJIA)
+sd(0.25*Stock$QQQ + 0.75*Stock$DJIA)
+
+# An alternative way to compute sd is to apply the formula 
+sqrt((0.25)^2*var(Stock$QQQ) + (0.75)^2*var(Stock$DJIA) + 2*0.25*0.75*cov(Stock$QQQ, Stock$DJIA))
+```
+The mean return would have been 0.05% and the SD would have been 1.12%.
+
+## 1(i)
+```{r}
+mean(Stock$QQQ)*100
+sd(Stock$QQQ)*10
+```
+The mean return after 100 trading days would be 7.61% (which is 100 times the mean daily return) and the SD of the return would be 13.5% (which is 10 times the SD of the daily return).
+
+# Question 2
+
+## 2(a)
+
+```{r}
+rm(list=ls())
+EV = read.csv("EV.csv", stringsAsFactors = TRUE)
+
+sort(table(EV$make)) / nrow(EV)
+```
+The three most popular manufacturers are Tesla (50.4%), Nissan (21.5%), and Chevrolet (13.7%).
+
+## 2(b)
+
+```{r}
+EV_tesla = subset(EV, make == "TESLA")
+sort(table(EV_tesla$model))
+sort(table(EV_tesla$county))
+```
+
+The most popular Tesla model is the Model 3.  King county has the most registered Tesla vehicles.
+
+## 2(c)
+
+```{r}
+hist(EV$range)
+```
+Range does not appear to be normally distributed.  It is not single-humped, but instead appears double-humped with a hole between the two humps at around 165 miles.  This is likely because the data contains two different types of EV's: BEV's and PHEV's, and they have different ranges.
+
+## 2(d)
+
+```{r}
+avgrange = tapply(EV$range, EV$year, mean)
+avgrange
+plot(2011:2020, avgrange)
+```
+
+
+## 2(e)
+
+```{r}
+propPHEV = table(EV$type)["PHEV"] / nrow(EV)
+propPHEV
+
+# Probability of getting 2 or fewer of 20
+pbinom(2,20,propPHEV)
+# Probability of exactly 2 of 20
+dbinom(2,20,propPHEV)
+```
+7.6% of the vehicles in the data set are hybrid (PHEV).  If you were to randomly select 20 vehicles from the data set, with probability 81% 2 or fewer vehicles out of the 20 would be hybrid (PHEV).  With probability 26%, exactly 2 vehicles would be hybrid (PHEV).
+
+## 2(f-g)
+
+```{r}
+EV$range_ge_160 = ifelse(EV$range >= 160,"range>=160","range<160")
+t=table(EV$type,EV$range_ge_160)
+
+# Probability table in 2(f)
+t/sum(t)
+
+# These next two rows take the row and column sums and attach them to the table so that
+# it looks nice when you print it. You don't have to do this though.
+t=cbind(t,rowSums(t))
+t=rbind(t,colSums(t))
+t
+
+#Probability table
+t / sum(t)
+
+#Pr(BEV|<160)
+t[1,1]/t[3,1]
+
+#Pr(BEV|>=160)
+t[1,2]/t[3,2]
+```
+The probability table is above in terms of counts.  Pr(BEV|range<160)=0.795  Pr(BEV|range>=160)=1.0
+
+## 2(h)
+
+```{r}
+phat = table(EV$type)["BEV"] / nrow(EV)
+phat
+SE = sqrt(phat*(1-phat)/nrow(EV))
+SE
+# 99% CI
+mult = qnorm(0.995,0,1)
+phat-mult*SE
+phat+mult*SE
+```
+The 99% CI is [0.921,0.927] or [92.1%,92.7%].
+
+## 2(i)
+
+```{r}
+teststat = (phat-0.92)/sqrt(0.92 * 0.08 / nrow(EV))
+teststat
+pvalue = 1-pnorm(teststat,0,1)
+pvalue
+```
+The null hypothesis is H0: p<=92%.  The alternative is H1: p>92%.  We can use the phat and SE from part (h).  The p-value is 0.00026 so there is strong evidence that the true fraction of vehicles that are all-electric (BEH) is greater than 92%.
+
+# Question 3
+
+## 3(a)
+
+```{r}
+rm(list=ls())
+
+BA = read.csv("BA.csv",stringsAsFactors = TRUE)
+table(grepl("london",tolower(BA$Route)))/nrow(BA)
+```
+47.7% of reviews list a flight that includes London.
+
+## 3(b)
+```{r}
+tapply(BA$ratingValue,BA$Seat.Type,mean)
+```
+Travelers in First Class seats leave on average the highest ratings.
+
+## 3(c)
+```{r}
+BA$Airbus = grepl("A",BA$Aircraft)
+
+# An alternative way to generate the column
+BA$Airbus = ifelse(grepl("A",BA$Aircraft), TRUE, FALSE)
+
+table(BA$Airbus)/nrow(BA)
+```
+26% of reviews list some kind of Airbus plane.
+
+
+```{r}
+tapply(BA$ratingValue,BA$Airbus,mean)
+```
+Reviews listing an Airbus plane leave an average rating of 5.34.
+
+
+```{r}
+Boeing1 = grepl("B",BA$Aircraft)
+Boeing2 = grepl("7",BA$Aircraft)
+t= table(Boeing1,Boeing2)/nrow(BA)
+t
+totalfractionBoeing = t[1,2]+t[2,1]+t[2,2]
+totalfractionBoeing
+# A shorter way to do the same thing.  The "|" character means logical "or".
+table( (Boeing1 | Boeing2) )/nrow(BA)
+```
+30.0% of reviews list some kind of Boeing plane.

@@ -1,0 +1,26 @@
+{
+    "id": "3FD63536",
+    "path": "~/research/software/ripw/R/date_equation.R",
+    "project_path": "R/date_equation.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1708382445163.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "51,19",
+        "scrollLine": "45"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1709444871,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1709444871402,
+    "read_only": false,
+    "read_only_alternatives": []
+}

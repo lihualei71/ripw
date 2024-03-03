@@ -1,0 +1,171 @@
+check_staggered <- function(tr){
+    row_staggered <- apply(tr, 1, function(w){
+        all(diff(w) >= 0)
+    })
+    all(row_staggered)
+}
+
+cox_standardize_input <- function(X_tv = NULL, X_ti = NULL,
+                                  T = NULL,
+                                  tvc = NULL, tic = NULL){
+    ## Return an empty matrix if nothing is given
+    if ((is.null(X_tv) && is.null(X_ti)) ||
+        (is.null(tvc) && is.null(tic))){
+        X <- NULL
+        formula <- "Surv(time1, time2, status)~1"
+        return(list(X = NULL, formula = formula,
+                    vars = NULL))
+    }
+
+
+    ## Combine time-varying and time-invariant covariates
+    if (is.null(X_tv)){
+        X <- lapply(1:T, function(t){
+            X_ti
+        })
+    } else if (!is.null(X_ti)){
+        X <- lapply(X_tv, function(x){
+            cbind(x, X_ti)
+        })
+    } else {
+        X <- X_tv
+    }
+    T <- length(X)
+
+    ## Construct the matrix for main effects with time-varying coeffcients
+    X_tvc <- matrix(NA, nrow = nrow(X[[1]])*T, ncol = 0)
+    if (!is.null(tvc)){
+        X_tvc <- lapply(X, function(x){
+            x[, tvc, drop=FALSE]
+        })
+        X_tvc <- do.call(Matrix::bdiag, X_tvc)
+        X_tvc <- as.matrix(X_tvc)
+        tvc <- paste0(rep(tvc, T),
+                           ".T",
+                           rep(1:T, each = length(tvc)))
+        colnames(X_tvc) <- tvc
+    }
+
+    ## Construct the matrix for main effects with time-invariant coeffcients
+    X_tic <- matrix(NA, nrow = nrow(X[[1]])*T, ncol = 0)
+    if (!is.null(tic)){
+        X_tic <- lapply(X, function(x){
+            x[, tic, drop=FALSE]
+        })
+        X_tic <- do.call(rbind, X_tic)
+        colnames(X_tic) <- tic
+    }
+
+    ## Combine two covariate matrices
+    X <- cbind(X_tvc, X_tic)
+
+    ## Generate variable names for main effects and interactions
+    vars <- c(tvc, tic)
+
+    ## Generate formula
+    formula <- paste0("Surv(time1, time2, status)~",
+                      paste0(vars,
+                             collapse = "+"))
+
+    return(list(X = X, formula = formula,
+                vars = vars))
+}
+
+pihat_cox <- function(tr,
+                      X_tv = NULL, X_ti = NULL,
+                      tvc = NULL, tic = NULL,
+                      cf = TRUE, nfolds = 10,
+                      foldid = NULL){
+
+    ## Check is the assignments are staggered
+    if (!check_staggered(tr)){
+        stop("Assignments are not staggered")
+    }
+
+    ## Check foldid
+    if (!is.null(foldid)){
+        nfolds <- length(foldid)
+    }
+
+    ## Generate data
+    n <- nrow(tr)
+    T <- ncol(tr)
+    data <- data.frame(
+        tr = as.numeric(tr),
+        unit = rep(1:n, T),
+        time = rep(1:T, each = n))
+
+    ## Standardize X
+    obj <- cox_standardize_input(X_tv, X_ti, T,
+                                 tvc, tic)
+
+    ## Combine X with tr
+    data <- data.frame(data, obj$X)
+    if (ncol(data) > 3){
+        names(data)[4:ncol(data)] <- colnames(obj$X)
+    }
+
+    ## Generate data for coxph
+    survdata <- list()
+    adopt_time <- rep(0, n) # 0 for never-treated units
+    for (i in 1:n){
+        tmpdata <- data[data$unit == i, ]
+        inds <- which(tmpdata$tr > 0)
+        if (length(inds) > 0){
+            ind <- min(inds)
+            tmpdata <- tmpdata[1:ind, ]
+            tmpdata$status <- c(rep(0, ind-1), 1)
+            adopt_time[i] <- ind
+        } else {
+            tmpdata$status <- 0
+        }
+        tmpdata$time1 <- tmpdata$time-1
+        tmpdata$time2 <- tmpdata$time
+        survdata[[i]] <- tmpdata
+    }
+    survdata <- do.call(rbind, survdata)
+
+    ## Fit cox model
+    gps_est <- rep(NA, n)
+    for (k in 1:nfolds){
+        ids <- foldid[[k]]
+        train <- survdata[!(survdata$unit %in% ids), ]
+        test <- survdata[survdata$unit %in% ids, ]
+        fit <- survival::coxph(as.formula(obj$formula), data = train)
+        res <- summary(survfit(fit, newdata = test, id = unit))
+        for (index in ids){
+            adopt <- adopt_time[index] > 0 # if ever-treated
+            if (is.null(res$strata)){
+                survprob <- res$surv
+            } else {
+                survprob <- res$surv[res$strata == index]
+            }
+            if (length(survprob) == 0){
+                ## If adopt_time[index] is earlier than
+                ## adoption times of all training units,
+                ## use P(T <= start_date) instead
+                earliest_date <- min(summary(survfit(fit))$time)
+                newtest <- test[test$unit == index, ]
+                added_row <- newtest[nrow(newtest), ]
+                added_row$time2 <- earliest_date
+                added_row$time1 <- earliest_date - 1
+                added_row$status <- 1
+                newtest <- rbind(newtest, added_row)
+                newres <- summary(survival::survfit(fit, newdata = newtest, id = unit))
+                survprob <- newres$surv
+            }
+            if (adopt){
+                if (length(survprob) == 1){
+                    gps_est[index] <- 1 - survprob
+                } else {
+                    gps_est[index] <- -diff(tail(survprob, 2))
+                }
+            } else {
+                ## For never-treated units, we regularize
+                ## the gps as P(T >= end_date - 1)
+                gps_est[index] <- tail(survprob, 2)[1]
+            }
+        }
+    }
+    return(gps_est)
+}

@@ -1,0 +1,26 @@
+{
+    "id": "6128311A",
+    "path": "~/research/software/ripw/R/imported-packages.R",
+    "project_path": "R/imported-packages.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1709444467865.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "1,58",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1709444543,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1709444543905,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,12 @@
+library("tidyverse")
+data <- read.csv("~/Downloads/2024-02-23T1022_Grades-W24-OIT-274-05_06.csv")
+data %>% filter(Section == "W24-OIT-274-05") %>%
+  .$W24.OIT.274.05.06.Midterm..591078. %>%
+  as.numeric %>%
+  sd
+#  hist(main = "Histogram of Midterm grade (Sec. 05)")
+data %>% filter(Section == "W24-OIT-274-06") %>%
+  .$W24.OIT.274.05.06.Midterm..591078. %>%
+  as.numeric %>%
+  sd
+#  hist(main = "Histogram of Midterm grade (Sec. 06)")

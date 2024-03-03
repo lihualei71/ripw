@@ -1,0 +1,26 @@
+{
+    "id": "0E145B01",
+    "path": "~/research/software/ripw/R/utils.R",
+    "project_path": "R/utils.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1708738451486.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "16,18",
+        "scrollLine": "12"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1708381156,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1708381156,
+    "read_only": false,
+    "read_only_alternatives": []
+}
