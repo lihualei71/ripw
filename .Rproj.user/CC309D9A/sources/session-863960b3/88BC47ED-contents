@@ -94,8 +94,8 @@
 #' # X_tv is for time-varying covariates, X_ti is for time-invariant covariates
 #' # tic is the list of variables with time-invariant coefficients; see pihat_cox for details
 #' pihat_params <- list(X_tv = X_tv,
-#'                     X_ti = X_ti,
-#'                     tic = c("confirmed", colnames(X_ti)))
+#'                      X_ti = X_ti,
+#'                      tic = c("confirmed", colnames(X_ti)))
 #' # main_tic is the list of variables with time-invariant coefficients in the main regression,
 #' # int_tic is the list of variables with stime-invariant coefficients in the interaction terms;
 #' # see muhat_twfe for details

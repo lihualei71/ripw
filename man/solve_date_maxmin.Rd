@@ -12,7 +12,7 @@ solve_date_maxmin(
 )
 }
 \arguments{
-\item{support}{the matrix \eqn{(\tilde{w}_{(1)}, ..., \tilde{w}_{(K)})}}
+\item{support}{the TxK matrix \eqn{(\tilde{w}_{(1)}, ..., \tilde{w}_{(K)})}}
 
 \item{xi}{weights used for the DATE}
 
@@ -27,4 +27,22 @@ solve_date_maxmin(
 }
 \description{
 Solver for the DATE equation that maximizes min_{w}Pi(w) (Appendix C.5)
+}
+\examples{
+\donttest{
+# Generate the support S* for staggered treatment with T=4
+support <- cbind(rep(0, 4), c(rep(0, 3), 1),
+                 c(rep(0, 2), rep(1, 2)),
+                 c(0, rep(1, 3)), rep(1, 4))
+xi <- rep(1/4, 4)
+solve_date_maxmin(support, xi)
+
+# Generate the support S* for transient treatment with T=4
+support <- cbind(rep(0, 4), c(0, 0, 0, 1),
+                 c(0, 0, 1, 0), c(0, 1, 0, 0),
+                 c(1, 0, 0, 0))
+xi <- rep(1/4, 4)
+solve_date_maxmin(support, xi)
+}
+
 }

@@ -28,8 +28,7 @@ solve_date <- function(support, xi,
     }
     init_val <- dateeq(init)
     if (max(abs(init_val)) < 1e-12){
-        cat("Initial value is a solution\n")
-        list(sol = obj$par, val = init_val, init_val = init_val)
+        list(sol = init, val = init_val, init_val = init_val)
     }
     normal_fac <- max(1e-6, sum(init_val^2) / 2)
     fn <- function(p){
@@ -56,7 +55,7 @@ solve_date <- function(support, xi,
 
 #' Solver for the DATE equation that maximizes min_{w}Pi(w) (Appendix C.5)
 #'
-#' @param support the matrix \eqn{(\tilde{w}_{(1)}, ..., \tilde{w}_{(K)})}
+#' @param support the TxK matrix \eqn{(\tilde{w}_{(1)}, ..., \tilde{w}_{(K)})}
 #' @param xi weights used for the DATE
 #' @param init initial value
 #' @param tol tolerance for the objective value
@@ -65,6 +64,23 @@ solve_date <- function(support, xi,
 #' \item{sol}{a solution (if found)}
 #' \item{val}{the value of the objective at sol}
 #' \item{init_val}{the value of the objective at init}
+#'
+#' @examples
+#' \donttest{
+#' # Generate the support S* for staggered treatment with T=4
+#' support <- cbind(rep(0, 4), c(rep(0, 3), 1),
+#'                  c(rep(0, 2), rep(1, 2)),
+#'                  c(0, rep(1, 3)), rep(1, 4))
+#' xi <- rep(1/4, 4)
+#' solve_date_maxmin(support, xi)
+#'
+#'# Generate the support S* for transient treatment with T=4
+#' support <- cbind(rep(0, 4), c(0, 0, 0, 1),
+#'                  c(0, 0, 1, 0), c(0, 1, 0, 0),
+#'                  c(1, 0, 0, 0))
+#' xi <- rep(1/4, 4)
+#' solve_date_maxmin(support, xi)
+#' }
 #'
 #' @export
 solve_date_maxmin <- function(support, xi,
