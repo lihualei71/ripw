@@ -1,5 +1,5 @@
 # ripw
-An R package for Reshaped Inverse Propensity Weighted (RIPW) Two-way fixed effects (TWFE) estimator (authored by Xiaoman Luo and Lihua Lei)
+An R package for Reshaped Inverse Propensity Weighted (RIPW) Two-way fixed effects (TWFE) estimator (co-developed by Xiaoman Luo and Lihua Lei)
 
 ## Overview
 This R package implements the RIPW-TWFE estimator for panel data analysis proposed in our paper: [Design-Robust Two-Way-Fixed-Effects Regression For Panel Data](https://arxiv.org/abs/2107.13737). 
