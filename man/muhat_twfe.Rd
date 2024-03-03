@@ -30,7 +30,7 @@ muhat_twfe(
 
 \item{main_tvc}{a vector of variable names for (both time-varying and time-invariant) variables with time-varying coefficients in the non-interacted terms. Leave it as default if no time-varying coefficient is used.}
 
-\item{main_tic}{a vector of variable names for (both time-varying and time-invariant) variables with time-invariant coefficients in the non-interacted terms. Leave it as default if no time-invariant coefficient is used.}
+\item{main_tic}{a vector of variable names for time-varying variables with time-invariant coefficients in the non-interacted terms. Leave it as default if no time-invariant coefficient is used. NOTE that no time-invariant variable should be included since they will be collinear with unit fixed effects.}
 
 \item{int_tvc}{a vector of variable names for (both time-varying and time-invariant) variables with time-varying coefficients in the interacted terms. Leave it as default if no time-varying coefficient is used.}
 

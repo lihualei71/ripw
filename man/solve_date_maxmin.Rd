@@ -2,7 +2,7 @@
 % Please edit documentation in R/date_equation.R
 \name{solve_date_maxmin}
 \alias{solve_date_maxmin}
-\title{Solver for the DATE equation that maximizes min_{w}Pi(w) (Appendix C.5)}
+\title{Solver for the DATE equation that maximizes \eqn{min_{w}\Pi(w)} (Appendix C.5)}
 \usage{
 solve_date_maxmin(
   support,
@@ -26,7 +26,7 @@ solve_date_maxmin(
 \item{init_val}{the value of the objective at init}
 }
 \description{
-Solver for the DATE equation that maximizes min_{w}Pi(w) (Appendix C.5)
+Solver for the DATE equation that maximizes \eqn{min_{w}\Pi(w)} (Appendix C.5)
 }
 \examples{
 \donttest{

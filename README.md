@@ -53,21 +53,39 @@ X_ti <- matrix(rnorm(n*d_ti), nrow = n) # generate time-invariant covariates as 
 colnames(X_ti) <- paste0("Xti", 1:d_ti)
 
 # Set up the parameters needed for treatment and outcome modeling
-pi_tvc <- c("Xtv1", "Xti1") # set of variables for pihat_cox with time-varying coefficients
-pi_tic <- c("Xtv2", "Xti2", "Xti3", "Xti4") # set of variables for pihat_cox with time-invariant coefficients
-pihat_params <- list(X_tv = X_tv, X_ti = X_ti, tvc = pi_tvc, tic = pi_tic)
+# set of variables for pihat_cox with time-varying coefficients
+pi_tvc <- c("Xtv1", "Xti1") 
+# set of variables for pihat_cox with time-invariant coefficients
+pi_tic <- c("Xtv2", "Xti2", "Xti3", "Xti4") 
+pihat_params <- list(X_tv = X_tv, X_ti = X_ti, 
+                     tvc = pi_tvc, tic = pi_tic)
 
-mu_main_tvc <- c("Xtv1", "Xti1") # set of variables for muhat_twfe with time-varying coefficients in the non-interacted terms
-mu_main_tic <- c("Xtv2") # set of variables for muhat_twfe with time-invariant coefficients in the non-interacted terms; no time-invariant variable should be included since they will be collinear with unit fixed effects
-mu_int_tvc <- c("Xtv1", "Xti1", "Xti2") # set of variables for muhat_twfe with time-varying coefficients in the interacted terms
-mu_int_tic <- c("Xtv1", "Xtv2", "Xti1", "Xti3", "Xti4") # set of variables for muhat_twfe with time-invariant coefficients in the interacted terms
-muhat_params <- list(X_tv = X_tv, X_ti = X_ti, main_tvc = mu_main_tvc, main_tic = mu_main_tic, 
-                     int_tvc = mu_int_tvc, int_tic = mu_int_tic, joint = TRUE) # joint=TRUE means fit a joint TWFE regression on both treated and control units
+# set of variables for muhat_twfe with time-varying coefficients 
+# in the non-interacted terms
+mu_main_tvc <- c("Xtv1", "Xti1") 
+# set of variables for muhat_twfe with time-invariant coefficients
+# in the non-interacted terms; no time-invariant variable should 
+# be included since they will be collinear with unit fixed effects
+mu_main_tic <- c("Xtv2") 
+# set of variables for muhat_twfe with time-varying coefficients 
+# in the interacted terms
+mu_int_tvc <- c("Xtv1", "Xti1", "Xti2") 
+# set of variables for muhat_twfe with time-invariant coefficients
+# in the interacted terms
+mu_int_tic <- c("Xtv1", "Xtv2", "Xti1", "Xti3", "Xti4") 
+# joint=TRUE means fit a joint TWFE regression on both treated and control units
+muhat_params <- list(X_tv = X_tv, X_ti = X_ti, 
+                     main_tvc = mu_main_tvc, main_tic = mu_main_tic, 
+                     int_tvc = mu_int_tvc, int_tic = mu_int_tic, 
+					 joint = TRUE) 
 
 # Fit the RIPW-TWFE estimator
 nreps <- 20 # number of sample splits for derandomization
 nfolds <- 10 # number of folds for cross-fitting
-res <- ripw_twfe(Y, tr, pihat_params = pihat_params, muhat_params = muhat_params, nreps = nreps, nfolds = nfolds)
+res <- ripw_twfe(Y, tr, 
+                 pihat_params = pihat_params, 
+				 muhat_params = muhat_params, 
+				 nreps = nreps, nfolds = nfolds)
 ```
 
 

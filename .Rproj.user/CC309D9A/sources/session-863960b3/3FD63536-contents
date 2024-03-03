@@ -53,7 +53,7 @@ solve_date <- function(support, xi,
     list(sol = obj$par, val = val, init_val = init_val)
 }
 
-#' Solver for the DATE equation that maximizes min_{w}Pi(w) (Appendix C.5)
+#' Solver for the DATE equation that maximizes \eqn{min_{w}\Pi(w)} (Appendix C.5)
 #'
 #' @param support the TxK matrix \eqn{(\tilde{w}_{(1)}, ..., \tilde{w}_{(K)})}
 #' @param xi weights used for the DATE
